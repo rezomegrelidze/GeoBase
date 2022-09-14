@@ -49,7 +49,7 @@ public class Database
     {
         foreach (var index in Cities)
         {
-            var location = Locations[index/96];
+            var location = Locations[index/96]; // 96 is the size of Location struct
             if(CityIndexes.TryGetValue(location.City,out var list))
             {
                 list.Add(location);
