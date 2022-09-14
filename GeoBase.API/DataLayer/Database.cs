@@ -56,7 +56,7 @@ public class Database
             }
             else
             {
-                CityIndexes[location.City] = new List<Location>();
+                CityIndexes[location.City] = new List<Location> {location};
             }
         }
     }
