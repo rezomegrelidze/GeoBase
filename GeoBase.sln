@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoBase.API", "GeoBase.API\GeoBase.API.csproj", "{DF02F1F5-C044-4D75-92FF-248379EA931A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoBase.API.Tests", "GeoBase.API.Tests\GeoBase.API.Tests.csproj", "{1231ACD8-3AE5-4CBA-A3B9-67F0F3C16D40}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DF02F1F5-C044-4D75-92FF-248379EA931A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF02F1F5-C044-4D75-92FF-248379EA931A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF02F1F5-C044-4D75-92FF-248379EA931A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF02F1F5-C044-4D75-92FF-248379EA931A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1231ACD8-3AE5-4CBA-A3B9-67F0F3C16D40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1231ACD8-3AE5-4CBA-A3B9-67F0F3C16D40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1231ACD8-3AE5-4CBA-A3B9-67F0F3C16D40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1231ACD8-3AE5-4CBA-A3B9-67F0F3C16D40}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EAE43A2C-D8AE-4B81-9C2E-E89B8DB0FC61}
+	EndGlobalSection
+EndGlobal
