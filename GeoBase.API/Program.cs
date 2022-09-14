@@ -1,5 +1,5 @@
-using GeoBase.API.Controllers;
 using GeoBase.API.DataLayer;
+using GeoBase.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
