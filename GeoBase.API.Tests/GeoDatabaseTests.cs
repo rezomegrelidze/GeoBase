@@ -15,7 +15,7 @@ namespace GeoBase.API.Tests
         public GeoDatabaseTests(ITestOutputHelper helper)
         {
             _helper = helper;
-            database = new Database();
+            database = Database.Instance;
         }
 
         [Fact]

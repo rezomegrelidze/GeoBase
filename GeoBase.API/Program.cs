@@ -1,11 +1,10 @@
 using GeoBase.API.DataLayer;
 using GeoBase.API.Services;
 
+Database.Instance.Initialize();
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 
-builder.Services.AddSingleton<Database>();
 builder.Services.AddTransient<LocationService>();
 
 builder.Services.AddControllers();

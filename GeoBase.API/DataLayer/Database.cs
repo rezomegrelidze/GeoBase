@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using GeoBase.API.Models;
@@ -15,18 +16,20 @@ public class Database
     public Location[] Locations;
     public uint[] Cities; // Indexes of locations sorted by citites
     public ConcurrentDictionary<string, List<Location>?> CityIndexes = new();
-    public Database()
+    private Database()
     {
-        Initialize();
     }
 
-    public Header Header { get; private set; }
-    
+    public static readonly Database Instance = new ();
 
-    private void Initialize()
+    public Header Header { get; private set; }
+
+
+    public void Initialize()
     {
-        
-        using var binaryReader = new BinaryReader(File.OpenRead(path));
+        var sw = Stopwatch.StartNew();
+        var bytes = File.ReadAllBytes(path);
+        using var binaryReader = new BinaryReader(new MemoryStream(bytes));
         Header = new Header
         {
             Version = binaryReader.ReadInt32(),
@@ -43,6 +46,8 @@ public class Database
         LoadCities(binaryReader);
 
         BuildCityIndex();
+        var ms = sw.ElapsedMilliseconds;
+        Debug.WriteLine($"Took {ms} ms");
     }
 
     private void BuildCityIndex()
@@ -56,7 +61,7 @@ public class Database
             }
             else
             {
-                CityIndexes[location.City] = new List<Location> {location};
+                CityIndexes.TryAdd(location.City, new List<Location> {location});
             }
         }
     }
@@ -110,11 +115,7 @@ public class Database
 
     static unsafe string GetString(BinaryReader reader,int count)
     {
-        var bytes = new sbyte[count];
-        for (int i = 0; i < count; i++)
-        {
-            bytes[i] = reader.ReadSByte();
-        }
+        var bytes = (sbyte[]) (Array) reader.ReadBytes(count);
 
         fixed (sbyte* ptr = bytes)
             return new string(ptr);

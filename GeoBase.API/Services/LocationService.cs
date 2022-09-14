@@ -6,27 +6,24 @@ namespace GeoBase.API.Services;
 
 public class LocationService
 {
-    private readonly Database _database;
-
-    public LocationService(Database database)
+    public LocationService()
     {
-        _database = database;
     }
 
     public Location? GetLocation(string ipAddress)
     {
         // uses binary search to search through ranges
         var address = IPAddress.Parse(ipAddress).Address;
-
+        var database = Database.Instance;
         int lo = 0;
-        int hi = _database.Ranges.Length - 1;
+        int hi = database.Ranges.Length - 1;
         while (lo <= hi)
         {
             var mid = (lo + hi) / 2;
 
-            var range = _database.Ranges[mid];
+            var range = database.Ranges[mid];
             if (address >= range.IpFrom && address <= range.IpTo)
-                return _database.Locations[range.LocationIndex];
+                return database.Locations[range.LocationIndex];
 
             if (address < range.IpFrom)
             {
@@ -44,6 +41,7 @@ public class LocationService
 
     public List<Location>? GetLocations(string city)
     {
-        return _database.CityIndexes[city];
+        var database = Database.Instance;
+        return database.CityIndexes[city];
     }
 }
