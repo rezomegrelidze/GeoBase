@@ -18,8 +18,8 @@ namespace GeoBase.API.Controllers
             var location = _service.GetLocation(ipAddress);
             if(location != null)
                 return Json(location);
-            else
-                return NotFound();
+
+            return NotFound();
         }
 
         [HttpGet("/city")]
@@ -28,8 +28,8 @@ namespace GeoBase.API.Controllers
             var locations = _service.GetLocations(city);
             if (locations != null)
                 return Json(locations);
-            else
-                return NotFound();
+
+            return NotFound();
         }
     }
 }
