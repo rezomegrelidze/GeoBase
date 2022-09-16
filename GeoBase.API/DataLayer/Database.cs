@@ -48,11 +48,12 @@ public class Database
         LoadCities(binaryReader);
 
 
+        var ms = sw.ElapsedMilliseconds;
+        Console.WriteLine($"Took {ms} ms");
+
         BuildCityIndex();
 
 
-        var ms = sw.ElapsedMilliseconds;
-        Console.WriteLine($"Took {ms} ms");
     }
 
     private void BuildCityIndex()
