@@ -13,7 +13,6 @@ public class FasterDatabase
 
     public Range[] Ranges;
     public Location[] Locations;
-    public uint[] Cities; // Indexes of locations sorted by citites
     public ConcurrentDictionary<string, ConcurrentBag<LocationDto>?> CityIndexes = new();
     private FasterDatabase()
     {
@@ -51,11 +50,9 @@ public class FasterDatabase
 
     private void LoadCities(FastBinaryReader binaryReader)
     {
-        var cities = new List<uint>();
         while (binaryReader.Position < binaryReader.MemoryLength)
         {
             var index = binaryReader.ReadUInt32();
-            cities.Add(index);
             Task.Run(() =>
             {
                 var location = Locations[index / 96]; // 96 is the size of Location struct
@@ -70,8 +67,6 @@ public class FasterDatabase
                 }
             });
         }
-
-        Cities = cities.ToArray();
     }
 
     private void LoadLocations(FastBinaryReader binaryReader)
