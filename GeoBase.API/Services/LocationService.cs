@@ -6,10 +6,6 @@ namespace GeoBase.API.Services;
 
 public class LocationService
 {
-    public LocationService()
-    {
-    }
-
     public Location? GetLocation(string ipAddress)
     {
         // uses binary search to search through ranges
