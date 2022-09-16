@@ -43,39 +43,32 @@ public class FasterDatabase
         LoadRanges(binaryReader);
         LoadLocations(binaryReader);
         LoadCities(binaryReader);
-
-
-
-        BuildCityIndex();
         
         var ms = sw.ElapsedMilliseconds;
         Console.WriteLine($"Took {ms} ms");
     }
-
-    private void BuildCityIndex()
-    {
-        Parallel.For(0, Cities.Length, i =>
-        {
-            var index = Cities[i];
-            var location = Locations[index / 96]; // 96 is the size of Location struct
-            if (CityIndexes.TryGetValue(GetString(location.City), out var list))
-            {
-                list.Add(new LocationDto(location));
-            }
-            else
-            {
-                var dto = new LocationDto(location);
-                CityIndexes.TryAdd(dto.City, new ConcurrentBag<LocationDto> { dto });
-            }
-        });
-    }
+    
 
     private void LoadCities(FastBinaryReader binaryReader)
     {
         var cities = new List<uint>();
         while (binaryReader.Position < binaryReader.MemoryLength)
         {
-            cities.Add(binaryReader.ReadUInt32());
+            var index = binaryReader.ReadUInt32();
+            cities.Add(index);
+            Task.Run(() =>
+            {
+                var location = Locations[index / 96]; // 96 is the size of Location struct
+                if (CityIndexes.TryGetValue(GetString(location.City), out var list))
+                {
+                    list.Add(new LocationDto(location));
+                }
+                else
+                {
+                    var dto = new LocationDto(location);
+                    CityIndexes.TryAdd(dto.City, new ConcurrentBag<LocationDto> {dto});
+                }
+            });
         }
 
         Cities = cities.ToArray();
