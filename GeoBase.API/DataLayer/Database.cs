@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Buffers;
+using System.Buffers.Binary;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -25,7 +27,7 @@ public class FastBinaryReader
 
     public int ReadInt32()
     {
-        var result = BitConverter.ToInt32(memory.Span.Slice(Position, 4));
+        var result = BinaryPrimitives.ReadInt32LittleEndian(memory.Span.Slice(Position, 4));
         Position += 4;
         return result;
     }
@@ -37,23 +39,23 @@ public class FastBinaryReader
         return result;
     }
 
-    public uint ReadUInt64()
+    public ulong ReadUInt64()
     {
-        var result = BitConverter.ToUInt32(memory.Span.Slice(Position, 8));
+        var result = BinaryPrimitives.ReadUInt64LittleEndian(memory.Span.Slice(Position, 8));
         Position += 8;
         return result;
     }
 
     public uint ReadUInt32()
     {
-        var result = BitConverter.ToUInt32(memory.Span.Slice(Position, 4));
+        var result = BinaryPrimitives.ReadUInt32LittleEndian(memory.Span.Slice(Position, 4));
         Position += 4;
         return result;
     }
 
     public float ReadSingle()
     {
-        var result = BitConverter.ToSingle(memory.Span.Slice(Position, 4));
+        var result = BinaryPrimitives.ReadSingleLittleEndian(memory.Span.Slice(Position, 4));
         Position += 4;
         return result;
     }
