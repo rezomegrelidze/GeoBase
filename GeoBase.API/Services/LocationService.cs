@@ -39,7 +39,7 @@ public class LocationService
         return null;
     }
 
-    public List<Location>? GetLocations(string city)
+    public List<LocationDto>? GetLocations(string city)
     {
         var database = Database.Instance;
         return database.CityIndexes[city];

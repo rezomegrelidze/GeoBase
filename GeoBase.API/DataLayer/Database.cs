@@ -17,7 +17,7 @@ public class Database
     public Range[] Ranges;
     public Location[] Locations;
     public uint[] Cities; // Indexes of locations sorted by citites
-    public ConcurrentDictionary<string, List<Location>?> CityIndexes = new();
+    public ConcurrentDictionary<string, List<LocationDto>?> CityIndexes = new();
     private Database()
     {
     }
@@ -47,9 +47,10 @@ public class Database
         LoadLocations(binaryReader);
         LoadCities(binaryReader);
 
-        BuildCityIndex();
         var ms = sw.ElapsedMilliseconds;
-        Debug.WriteLine($"Took {ms} ms");
+        Console.WriteLine($"Took {ms} ms");
+
+        BuildCityIndex();
     }
 
     private void BuildCityIndex()
@@ -59,11 +60,12 @@ public class Database
             var location = Locations[index/96]; // 96 is the size of Location struct
             if(CityIndexes.TryGetValue(GetString(location.City),out var list))
             {
-                list.Add(location);
+                list.Add(new LocationDto(location));
             }
             else
             {
-                CityIndexes.TryAdd(GetString(location.City), new List<Location> {location});
+                var dto = new LocationDto(location);
+                CityIndexes.TryAdd(dto.City, new List<LocationDto> { dto });
             }
         }
     }
