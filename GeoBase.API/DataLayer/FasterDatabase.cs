@@ -1,77 +1,25 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using GeoBase.API.Models;
-using Microsoft.VisualBasic.CompilerServices;
 using Range = GeoBase.API.Models.Range;
 
 namespace GeoBase.API.DataLayer;
 
-public class FastBinaryReader
-{
-    public int Position;
-    
-    private readonly Memory<byte> memory;
-
-    public FastBinaryReader(string path)
-    {
-        memory = File.ReadAllBytes(path).AsMemory();
-    }
-
-    public int MemoryLength => memory.Length;
-
-    public int ReadInt32()
-    {
-        var result = BitConverter.ToInt32(memory.Span.Slice(Position, 4));
-        Position += 4;
-        return result;
-    }
-
-    public byte[] ReadBytes(int count)
-    {
-        var result = memory.Span.Slice(Position, count).ToArray();
-        Position += count;
-        return result;
-    }
-
-    public uint ReadUInt64()
-    {
-        var result = BitConverter.ToUInt32(memory.Span.Slice(Position, 8));
-        Position += 8;
-        return result;
-    }
-
-    public uint ReadUInt32()
-    {
-        var result = BitConverter.ToUInt32(memory.Span.Slice(Position, 4));
-        Position += 4;
-        return result;
-    }
-
-    public float ReadSingle()
-    {
-        var result = BitConverter.ToSingle(memory.Span.Slice(Position, 4));
-        Position += 4;
-        return result;
-    }
-}
-
-public class Database
+public class FasterDatabase
 {
     private string path = "DB\\geobase.dat";
+
+    long Position;
 
     public Range[] Ranges;
     public Location[] Locations;
     public uint[] Cities; // Indexes of locations sorted by citites
     public ConcurrentDictionary<string, ConcurrentBag<LocationDto>?> CityIndexes = new();
-    private Database()
+    private FasterDatabase()
     {
     }
 
-    public static readonly Database Instance = new ();
+    public static readonly FasterDatabase Instance = new();
 
     public Header Header { get; private set; }
 
@@ -79,8 +27,8 @@ public class Database
     public void Initialize()
     {
         var sw = Stopwatch.StartNew();
-        var bytes = File.ReadAllBytes(path);
-        using var binaryReader = new BinaryReader(new MemoryStream(bytes));
+        FastBinaryReader binaryReader = new FastBinaryReader(path);
+
         Header = new Header
         {
             Version = binaryReader.ReadInt32(),
@@ -96,18 +44,15 @@ public class Database
         LoadLocations(binaryReader);
         LoadCities(binaryReader);
 
+        BuildCityIndex();
 
         var ms = sw.ElapsedMilliseconds;
         Console.WriteLine($"Took {ms} ms");
-
-        BuildCityIndex();
-
-
     }
 
     private void BuildCityIndex()
     {
-        Parallel.For(0,Cities.Length, i =>
+        Parallel.For(0, Cities.Length, i =>
         {
             var index = Cities[i];
             var location = Locations[index / 96]; // 96 is the size of Location struct
@@ -118,15 +63,15 @@ public class Database
             else
             {
                 var dto = new LocationDto(location);
-                CityIndexes.TryAdd(dto.City, new ConcurrentBag<LocationDto> {dto});
+                CityIndexes.TryAdd(dto.City, new ConcurrentBag<LocationDto> { dto });
             }
         });
     }
 
-    private void LoadCities(BinaryReader binaryReader)
+    private void LoadCities(FastBinaryReader binaryReader)
     {
         var cities = new List<uint>();
-        while(binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
+        while (binaryReader.Position < binaryReader.MemoryLength)
         {
             cities.Add(binaryReader.ReadUInt32());
         }
@@ -134,7 +79,7 @@ public class Database
         Cities = cities.ToArray();
     }
 
-    private void LoadLocations(BinaryReader binaryReader)
+    private void LoadLocations(FastBinaryReader binaryReader)
     {
         long length = (Header.OffsetCities - Header.OffsetLocations) / 96; // 96 is the size of Location struct 
         Locations = new Location[length];
@@ -156,7 +101,7 @@ public class Database
         }
     }
 
-    private unsafe void LoadRanges(BinaryReader binaryReader)
+    private unsafe void LoadRanges(FastBinaryReader binaryReader)
     {
         var length = (Header.OffsetLocations - Header.OffsetRanges) / sizeof(Range);
         Ranges = new Range[length];
@@ -179,12 +124,11 @@ public class Database
             return new string(ptr);
     }
 
-    static unsafe string GetString(BinaryReader reader,int count)
+    static unsafe string GetString(FastBinaryReader reader, int count)
     {
-        var bytes = (sbyte[]) (Array) reader.ReadBytes(count);
+        var bytes = (sbyte[])(Array)reader.ReadBytes(count);
 
         fixed (sbyte* ptr = bytes)
             return new string(ptr);
     }
-
 }

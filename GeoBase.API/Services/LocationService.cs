@@ -11,7 +11,7 @@ public class LocationService
     {
         // uses binary search to search through ranges
         var address = IPAddress.Parse(ipAddress).Address;
-        var database = Database.Instance;
+        var database = FasterDatabase.Instance;
         int lo = 0;
         int hi = database.Ranges.Length - 1;
         while (lo <= hi)
@@ -38,7 +38,7 @@ public class LocationService
 
     public ConcurrentBag<LocationDto>? GetLocations(string city)
     {
-        var database = Database.Instance;
+        var database = FasterDatabase.Instance;
         return database.CityIndexes[city];
     }
 }
