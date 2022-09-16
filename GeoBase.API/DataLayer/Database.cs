@@ -17,7 +17,7 @@ public class Database
     public Range[] Ranges;
     public Location[] Locations;
     public uint[] Cities; // Indexes of locations sorted by citites
-    public ConcurrentDictionary<string, List<LocationDto>?> CityIndexes = new();
+    public ConcurrentDictionary<string, ConcurrentBag<LocationDto>?> CityIndexes = new();
     private Database()
     {
     }
@@ -47,29 +47,30 @@ public class Database
         LoadLocations(binaryReader);
         LoadCities(binaryReader);
 
+
         BuildCityIndex();
 
 
         var ms = sw.ElapsedMilliseconds;
         Console.WriteLine($"Took {ms} ms");
-
     }
 
     private void BuildCityIndex()
     {
-        foreach (var index in Cities)
+        Parallel.For(0,Cities.Length, i =>
         {
-            var location = Locations[index/96]; // 96 is the size of Location struct
-            if(CityIndexes.TryGetValue(GetString(location.City),out var list))
+            var index = Cities[i];
+            var location = Locations[index / 96]; // 96 is the size of Location struct
+            if (CityIndexes.TryGetValue(GetString(location.City), out var list))
             {
                 list.Add(new LocationDto(location));
             }
             else
             {
                 var dto = new LocationDto(location);
-                CityIndexes.TryAdd(dto.City, new List<LocationDto> { dto });
+                CityIndexes.TryAdd(dto.City, new ConcurrentBag<LocationDto> {dto});
             }
-        }
+        });
     }
 
     private void LoadCities(BinaryReader binaryReader)

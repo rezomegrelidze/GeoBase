@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Concurrent;
+using System.Net;
 using GeoBase.API.DataLayer;
 using GeoBase.API.Models;
 
@@ -35,7 +36,7 @@ public class LocationService
         return null;
     }
 
-    public List<LocationDto>? GetLocations(string city)
+    public ConcurrentBag<LocationDto>? GetLocations(string city)
     {
         var database = Database.Instance;
         return database.CityIndexes[city];
