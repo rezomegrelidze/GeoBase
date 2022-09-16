@@ -2,7 +2,7 @@
 
 public class LocationDto
 {
-    public string Country;
+    public string Country { get; set; }
     public string Region { get; init; }
 
     public string Postal { get; init; }
