@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using GeoBase.API.Models;
 using Microsoft.VisualBasic.CompilerServices;
 using Range = GeoBase.API.Models.Range;
@@ -55,13 +57,13 @@ public class Database
         foreach (var index in Cities)
         {
             var location = Locations[index/96]; // 96 is the size of Location struct
-            if(CityIndexes.TryGetValue(location.City,out var list))
+            if(CityIndexes.TryGetValue(GetString(location.City),out var list))
             {
                 list.Add(location);
             }
             else
             {
-                CityIndexes.TryAdd(location.City, new List<Location> {location});
+                CityIndexes.TryAdd(GetString(location.City), new List<Location> {location});
             }
         }
     }
@@ -85,15 +87,17 @@ public class Database
         {
             var location = new Location
             {
-                Country = GetString(binaryReader, 8),
-                Region = GetString(binaryReader,12),
-                Postal = GetString(binaryReader,12),
-                City = GetString(binaryReader,24),
-                Organization = GetString(binaryReader,32),
+                Country = binaryReader.ReadBytes(8),
+                Region = binaryReader.ReadBytes(12),
+                Postal = binaryReader.ReadBytes(12),
+                City = binaryReader.ReadBytes(24),
+                Organization = binaryReader.ReadBytes(32),
                 Latitude = binaryReader.ReadSingle(),
                 Longitude = binaryReader.ReadSingle(),
             };
+
             Locations[i] = location;
+
         }
     }
 
@@ -111,6 +115,13 @@ public class Database
             };
             Ranges[i] = range;
         }
+    }
+
+    static unsafe string GetString(byte[] bytes)
+    {
+
+        fixed (sbyte* ptr = (sbyte[])(Array)bytes)
+            return new string(ptr);
     }
 
     static unsafe string GetString(BinaryReader reader,int count)
