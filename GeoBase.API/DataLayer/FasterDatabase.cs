@@ -44,8 +44,10 @@ public class FasterDatabase
         LoadLocations(binaryReader);
         LoadCities(binaryReader);
 
-        BuildCityIndex();
 
+
+        BuildCityIndex();
+        
         var ms = sw.ElapsedMilliseconds;
         Console.WriteLine($"Took {ms} ms");
     }

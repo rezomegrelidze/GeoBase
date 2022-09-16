@@ -7,7 +7,7 @@ namespace GeoBase.API.Services;
 
 public class LocationService
 {
-    public Location? GetLocation(string ipAddress)
+    public LocationDto? GetLocation(string ipAddress)
     {
         // uses binary search to search through ranges
         var address = IPAddress.Parse(ipAddress).Address;
@@ -20,7 +20,7 @@ public class LocationService
 
             var range = database.Ranges[mid];
             if (address >= range.IpFrom && address <= range.IpTo)
-                return database.Locations[range.LocationIndex];
+                return new LocationDto(database.Locations[range.LocationIndex]);
 
             if (address < range.IpFrom)
             {
