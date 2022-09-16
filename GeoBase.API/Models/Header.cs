@@ -1,6 +1,5 @@
 ﻿namespace GeoBase.API.Models;
 
-[Serializable]
 public struct Header
 {
     public int Version { get; init; }
