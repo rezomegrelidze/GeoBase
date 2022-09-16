@@ -1,6 +1,6 @@
 ﻿namespace GeoBase.API.Models;
 
-public class LocationDto
+public struct LocationDto
 {
     public string Country { get; set; }
     public string Region { get; init; }

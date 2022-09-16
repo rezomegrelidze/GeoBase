@@ -47,10 +47,12 @@ public class Database
         LoadLocations(binaryReader);
         LoadCities(binaryReader);
 
+        BuildCityIndex();
+
+
         var ms = sw.ElapsedMilliseconds;
         Console.WriteLine($"Took {ms} ms");
 
-        BuildCityIndex();
     }
 
     private void BuildCityIndex()
